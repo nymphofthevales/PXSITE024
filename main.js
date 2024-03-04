@@ -3,33 +3,65 @@ import * as THREE from 'three';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// const camera = new THREE.OrthographicCamera();
 const clock = new THREE.Clock();
+
+const lady = new THREE.TextureLoader().load("./static/textures/menu_lady_mockup.png");
+const hand = new THREE.TextureLoader().load("./static/textures/hand.png");
+
+const sphere = new THREE.SphereGeometry(2,6,4);
+const back_plane = new THREE.PlaneGeometry(30,60);
+const front_plane = new THREE.PlaneGeometry(30,30);
+const material = new THREE.MeshStandardMaterial( { 
+    color: 0x55ffff,
+    emissive: 'lightblue',
+    emissiveIntensity: 0.3
+} );
+const mat = new THREE.MeshBasicMaterial( {
+    map: lady,
+    transparent: true
+} );
+const hand_mat = new THREE.MeshBasicMaterial( {
+    map: hand,
+    transparent: true
+} ); 
 
 //setup renderer canvas element
 const canvas = document.getElementById("3DCanvas")
 const renderer = new THREE.WebGLRenderer({ canvas });
-const scaleRatio = 2;
+const scaleRatio = 1;
 renderer.setSize( window.innerWidth/scaleRatio, window.innerHeight/scaleRatio );
-document.body.innerHTML = ""
-document.body.appendChild( renderer.domElement ).id = `rendererCanvas`;
 
-//add cube to scene
-const geometry = new THREE.SphereGeometry(3,8,4);
-const material = new THREE.MeshBasicMaterial( { color: 0x00aaff } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+const orb = new THREE.Mesh( sphere, material );
+const backPlane = new THREE.Mesh( back_plane, mat );
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.4 );
+const frontPlane = new THREE.Mesh( front_plane, hand_mat );
 
-//add light to scene
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.2 );
-scene.add( directionalLight );
+function getRandOrbit({
+    radius: [r1, r2],
+    tubeRadius: tr,
+    radialSegments: rs,
+    tubularSegments: ts
 
-camera.position.z = 5;
+} = {
+    radius: [15, 40],
+    tubeRadius: 0.1,
+    radialSegments: 8,
+    tubularSegments: 40
+} ) {
+    let r = THREE.MathUtils.randInt(r1,r2);
+    let x = new THREE.TorusGeometry(r, tr, rs, ts);
+    let o = new THREE.Mesh( x, material );
+    return o
+}
 
 let frame = 0;
 
 function animate() {
     requestAnimationFrame( animate );
-    incrementRotation(cube, 0.01);
+    incrementRotation(orb, 0.01);
+    rotateOrbits();
+    orb.material.emissiveIntensity = pulse([0.1, 0.7], 120);
     frame += 1;
     renderer.render( scene, camera );
 }
@@ -40,9 +72,75 @@ function incrementRotation( mesh, interval ) {
 
 }
 
-function pulseColor() {
-    material.color += 0x010000;
+function pulse([a, b], speed) {
+    let stretch = (b - a);
+    let verticalOffset = stretch + a;
+    let frequency = ( speed / Math.PI );
+
+   let i = stretch * Math.sin( frame / frequency ) + verticalOffset;
+   return i
 }
+
+let orbits = []
+for (let i=0; i < 6; i++) {
+    orbits.push( getRandOrbit() );
+}
+for (let i=0; i < orbits.length; i++) {
+    scene.add( orbits[i] );
+    orbits[i].rotation.set( 5, 0, 0 )
+}
+function rotateOrbits() {
+    for (let i=0; i < orbits.length; i++) {
+        let oldZ = orbits[i].rotation.z;
+        orbits[i].rotation.set( 5, 0, oldZ + 0.006 );
+    }
+}
+
+scene.add( backPlane );
+scene.add( frontPlane );
+scene.add( orb );
+scene.add( directionalLight );
+
+backPlane.position.set( 0, 0, -5 );
+frontPlane.position.set( 0, 7, 5 );
+camera.position.set( 0, 0, 60 );
+orb.position.set( 0, 8, 0 );
+directionalLight.position.set( 1, 1, 4 );
 
 clock.start();
 animate()
+
+
+let zoomTracker = 2;
+let changeIn = new THREE.Vector3( 0, 0, -10 );
+let changeOut = new THREE.Vector3( 0, 0, 10 );
+
+let invertScroll = document.getElementById("invertScroll");
+let zoomin = document.getElementById("zoomin");
+let zoomout = document.getElementById("zoomout");
+zoomin.addEventListener("mousedown", ()=>{ zoomIn() });
+zoomout.addEventListener("mousedown", ()=>{ zoomOut() });
+
+window.addEventListener("wheel", (e)=>{ handleScrollInput(e) });
+
+function handleScrollInput(event) {
+    console.log(event.deltaY)
+    if (event.deltaY > 0 == invertScroll.checked) {
+        zoomIn();
+    } else {
+        zoomOut();
+    }
+};
+
+function zoomIn() {
+    if (zoomTracker > 0) {
+        zoomTracker -= 1;
+        camera.position.add(changeIn);
+    }
+}
+function zoomOut() {
+    if (zoomTracker < 20) {
+        zoomTracker += 1;
+        camera.position.add(changeOut);
+    }
+}
