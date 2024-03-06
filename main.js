@@ -92,7 +92,7 @@ for (let i=0; i < orbits.length; i++) {
 function rotateOrbits() {
     for (let i=0; i < orbits.length; i++) {
         let oldZ = orbits[i].rotation.z;
-        orbits[i].rotation.set( 5, 0, oldZ + 0.006 );
+        orbits[i].rotation.set( 5, 0, oldZ + 0.006 ); //rotation is on z because axis is relative
     }
 }
 
@@ -109,6 +109,7 @@ directionalLight.position.set( 1, 1, 4 );
 
 clock.start();
 animate()
+
 
 
 let zoomTracker = 2;
