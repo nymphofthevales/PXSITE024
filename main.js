@@ -110,38 +110,3 @@ directionalLight.position.set( 1, 1, 4 );
 clock.start();
 animate()
 
-
-
-let zoomTracker = 2;
-let changeIn = new THREE.Vector3( 0, 0, -10 );
-let changeOut = new THREE.Vector3( 0, 0, 10 );
-
-let invertScroll = document.getElementById("invertScroll");
-let zoomin = document.getElementById("zoomin");
-let zoomout = document.getElementById("zoomout");
-zoomin.addEventListener("mousedown", ()=>{ zoomIn() });
-zoomout.addEventListener("mousedown", ()=>{ zoomOut() });
-
-window.addEventListener("wheel", (e)=>{ handleScrollInput(e) });
-
-function handleScrollInput(event) {
-    console.log(event.deltaY)
-    if (event.deltaY > 0 == invertScroll.checked) {
-        zoomIn();
-    } else {
-        zoomOut();
-    }
-};
-
-function zoomIn() {
-    if (zoomTracker > 0) {
-        zoomTracker -= 1;
-        camera.position.add(changeIn);
-    }
-}
-function zoomOut() {
-    if (zoomTracker < 20) {
-        zoomTracker += 1;
-        camera.position.add(changeOut);
-    }
-}

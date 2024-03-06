@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 
 
-function animate(): void {
+function animateLoop(): void {
 
 }
 
