@@ -1,12 +1,13 @@
 import * as THREE from "three";
 
-class ZoomController {
+export class ZoomControl {
     camera: THREE.Camera;
     scene: THREE.Scene;
 
     zoomTracker = 2;
-    changeIn = new THREE.Vector3( 0, 0, -10 );
-    changeOut = new THREE.Vector3( 0, 0, 10 );
+    step = 10;
+    changeIn = new THREE.Vector3( 0, 0, -this.step );
+    changeOut = new THREE.Vector3( 0, 0, this.step );
 
     invertScroll: HTMLInputElement;
     zoomInBtn: HTMLButtonElement;
@@ -21,6 +22,8 @@ class ZoomController {
         this.invertScroll = opts.invertBtn;
         this.zoomInBtn = opts.zoomInBtn;
         this.zoomOutBtn = opts.zoomOutBtn;
+
+        this.setInputListeners();
     }
     setInputListeners() {
         this.zoomInBtn.addEventListener("mousedown", (e)=>{ this.zoomIn() });
