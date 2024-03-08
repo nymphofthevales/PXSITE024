@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ZoomControl } from './ZoomControl';
 import { AssetsManager } from './AssetsManager';
 import { AnimationController } from './AnimationController'
+import { UserInteraction } from './UserInteraction';
 
 
 export class PXSiteHome {
@@ -18,6 +19,7 @@ export class PXSiteHome {
         frameDelay: 0,
         lastFrameTime: 0
     }
+
 
     userInteractionControllers = {
         mainZoom: new ZoomControl(this.scene, this.mainCamera)
@@ -57,7 +59,7 @@ export class PXSiteHome {
         }
     }
     prepareGeneratedModels() {
-        this.assets.generateOrbits()
+        this.assets.generateOrbits();
     }
     positionElementsInScene() {
         this.assets.setDefaultPosition();

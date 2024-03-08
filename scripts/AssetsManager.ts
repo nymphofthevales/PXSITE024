@@ -53,7 +53,7 @@ export class AssetsManager {
     } ) {
         let r = THREE.MathUtils.randInt(r1,r2);
         let x = new THREE.TorusGeometry(r, tr, rs, ts);
-        x.rotateX(0.5*Math.PI)
+        x.rotateX( 0.5 * Math.PI );
         let o = new THREE.Mesh( x, this.materials.glowBlue );
         return o
     }
